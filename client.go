@@ -25,6 +25,11 @@ func processUserCommand(reader *bufio.Reader) {
 		fmt.Printf("Unexpected error parsing command: %s\n", err.Error())
 		return
 	}
+	if fullCmd.Command == userinput.EXIT {
+		fmt.Println("Received exit signal, shutting down...")
+		kvserver.Close()
+		os.Exit(0)
+	}
 }
 
 func main() {
@@ -42,6 +47,7 @@ func main() {
 	fmt.Println("   get(id)                 - returns value for id")
 	fmt.Println("   set(id,val)             - sets value for id")
 	fmt.Println("   testset(id,prevVal,val) - if id has prevVal as its value, set new value")
+	fmt.Println("   exit                    - shut down client")
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		processUserCommand(reader)
@@ -50,7 +56,7 @@ func main() {
 	os.Exit(0)
 }
 
-// General-purpose error handler.
+// If error is non-nil, print error and shut down
 func checkError(err error) {
 	if err != nil {
 		fmt.Println(err)

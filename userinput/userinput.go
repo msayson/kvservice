@@ -10,6 +10,7 @@ import (
 var GET string = "get"
 var SET string = "set"
 var TESTSET string = "testset"
+var EXIT string = "exit"
 
 var legalWord string = "([a-zA-Z0-9_]+)"
 var legalGet string = fmt.Sprintf("(%s)\\(%s\\)", GET, legalWord)
@@ -34,6 +35,8 @@ func ParseCommand(text string) (LegalCommand, error) {
 	trimmedText := strings.TrimSpace(text)
 	if IsLegalCommand(trimmedText) {
 		parsedCmd = extractCommand(trimmedText)
+	} else if trimmedText == EXIT {
+		parsedCmd = LegalCommand{EXIT, []string{}}
 	} else {
 		err = errors.New(fmt.Sprintf("Invalid command: %s", trimmedText))
 	}
