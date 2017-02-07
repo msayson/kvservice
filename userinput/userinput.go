@@ -31,10 +31,11 @@ func IsLegalCommand(text string) bool {
 func ParseCommand(text string) (LegalCommand, error) {
 	var parsedCmd LegalCommand
 	var err error
-	if IsLegalCommand(text) {
-		parsedCmd = extractCommand(text)
+	trimmedText := strings.TrimSpace(text)
+	if IsLegalCommand(trimmedText) {
+		parsedCmd = extractCommand(trimmedText)
 	} else {
-		err = errors.New(fmt.Sprintf("Invalid command: %s", text))
+		err = errors.New(fmt.Sprintf("Invalid command: %s", trimmedText))
 	}
 	return parsedCmd, err
 }

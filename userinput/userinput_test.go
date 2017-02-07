@@ -51,6 +51,7 @@ func TestParseCommand(t *testing.T) {
 		{"get(Hello123)", "get", []string{"Hello123"}},
 		{"set(Hello123,MyVal)", "set", []string{"Hello123", "MyVal"}},
 		{"testset(Hello123,OldVal,NewVal)", "testset", []string{"Hello123", "OldVal", "NewVal"}},
+		{" get(Hello123)   ", "get", []string{"Hello123"}}, //trims whitespace
 	}
 	for _, test := range testCases {
 		input := test.input
