@@ -1,8 +1,13 @@
-// Command-line client for key-value service
+// A command-line client for the key-value service
+//
 // Usage: go run client.go [server ip:port]
+//
+// - [server ip:port] : the IP address and TCP port of the server to connect to
+
 package main
 
 import (
+	"./kvserviceapi"
 	"./userinput"
 	"bufio"
 	"fmt"
@@ -12,25 +17,6 @@ import (
 
 // The RPC object for the key-value server
 var kvserver *rpc.Client
-
-func processUserCommand(reader *bufio.Reader) {
-	fmt.Print("> ")
-	text, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Printf("Unexpected error reading user input: %s\n", err.Error())
-		return
-	}
-	fullCmd, err := userinput.ParseCommand(text)
-	if err != nil {
-		fmt.Printf("Unexpected error parsing command: %s\n", err.Error())
-		return
-	}
-	if fullCmd.Command == userinput.EXIT {
-		fmt.Println("Received exit signal, shutting down...")
-		kvserver.Close()
-		os.Exit(0)
-	}
-}
 
 func main() {
 	if len(os.Args) != 2 {
@@ -54,6 +40,39 @@ func main() {
 	}
 
 	os.Exit(0)
+}
+
+func processUserCommand(reader *bufio.Reader) {
+	fmt.Print("> ")
+	text, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Printf("Unexpected error reading user input: %s\n", err.Error())
+		return
+	}
+	fullCmd, err := userinput.ParseCommand(text)
+	if err != nil {
+		fmt.Printf("Unexpected error parsing command: %s\n", err.Error())
+		return
+	}
+	if fullCmd.Command == userinput.EXIT {
+		fmt.Println("Received exit signal, shutting down...")
+		kvserver.Close()
+		os.Exit(0)
+	}
+	runUserCommand(fullCmd)
+}
+
+func runUserCommand(cmd userinput.LegalCommand) {
+	if cmd.Command == userinput.GET {
+		val := kvserviceapi.Get(kvserver, cmd.Args[0])
+		fmt.Printf("get(%s) -> %s\n", cmd.Args[0], val)
+	} else if cmd.Command == userinput.SET {
+		val := kvserviceapi.Set(kvserver, cmd.Args[0], cmd.Args[1])
+		fmt.Printf("set(%s,%s) -> %s\n", cmd.Args[0], cmd.Args[1], val)
+	} else if cmd.Command == userinput.TESTSET {
+		val := kvserviceapi.TestSet(kvserver, cmd.Args[0], cmd.Args[1], cmd.Args[2])
+		fmt.Printf("testset(%s,%s,%s) -> %s\n", cmd.Args[0], cmd.Args[1], cmd.Args[2], val)
+	}
 }
 
 // If error is non-nil, print error and shut down
