@@ -14,13 +14,14 @@ Client command line interface:
   <tr><td>exit</td><td>shuts down client</td></tr>
 </table>
 
-### Variation 2 - chain of servers (upcoming)
+### Variation 2 - dynamic chain of servers (upcoming)
 A simple key-value service with data replication across a chain of N back-end servers.
 
 - Client interacts with the front-end server exactly as in Phase 1
 - A chain of N back-end servers store identical copies of all key-values
 - Key-value write operations are performed on each back-end server, passed from one to the next until all are updated
 - Key-value read operations are performed on the first back-end server in the chain
+- Back-end nodes may join or leave the network at any time
 
 Failure recovery strategy:
 
@@ -30,7 +31,8 @@ Failure recovery strategy:
 Design properties:
 
 - Robust to one back-end failing at a time, up to a maximum of N-1 back-end failures
-- Not robust to the front-end server failing, or to two adjacent back-end nodes failing simultaneously
+- Not robust to the front-end server failing
+- If two adjacent back-end nodes fail simultaneously, then subsequent back-end nodes will be stranded.  However, if at least one of the first two back-end nodes survives the failure, we can continue operating without a break in service.
 
 ### Disclaimer
 
