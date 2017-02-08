@@ -30,10 +30,10 @@ func main() {
 	checkError(err)
 
 	fmt.Printf("Enter commands below.\nSupported commands:\n")
-	fmt.Println("   get(id)                 - returns value for id")
-	fmt.Println("   set(id,val)             - sets value for id")
-	fmt.Println("   testset(id,prevVal,val) - if id has prevVal as its value, set new value")
-	fmt.Println("   exit                    - shut down client")
+	fmt.Println("   get(id)                    - returns value for id")
+	fmt.Println("   set(id,val)                - sets value for id")
+	fmt.Println("   testset(id,testVal,newVal) - if id has testVal as its value, set to newVal")
+	fmt.Println("   exit                       - shuts down client")
 	reader := bufio.NewReader(os.Stdin)
 	for {
 		processUserCommand(reader)
