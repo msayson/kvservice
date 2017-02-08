@@ -14,7 +14,7 @@ Client command line interface:
   <tr><td>exit</td><td>shuts down client</td></tr>
 </table>
 
-### Variation 2 - dynamic chain of servers (upcoming)
+### Variation 2 - dynamic chain of servers (in progress)
 A simple key-value service with data replication across a chain of N back-end servers.
 
 - Client interacts with the front-end server exactly as in Variation 1

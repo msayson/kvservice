@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"github.com/msayson/kvservice/util/rpc_util"
 	"net/rpc"
 )
 
@@ -24,6 +25,11 @@ type TestSetArgs struct {
 	NewVal  string
 }
 
+// Struct for Join() RPC call arguments
+type JoinArgs struct {
+	IpPort string // ip:port of node requesting to join network
+}
+
 // Struct for RPC call replies
 type ValReply struct {
 	Val string
@@ -32,8 +38,7 @@ type ValReply struct {
 // Initiate a Get() RPC call
 func Get(kvserver *rpc.Client, key string) string {
 	reply := ValReply{}
-	setArgs := GetArgs{key}
-	err := kvserver.Call("KeyValService.Get", setArgs, &reply)
+	err := kvserver.Call("KeyValService.Get", GetArgs{key}, &reply)
 	if err != nil {
 		fmt.Sprintf("KeyValService.Get RPC call failed: %v", err)
 	}
@@ -43,8 +48,7 @@ func Get(kvserver *rpc.Client, key string) string {
 // Initiate a Set() RPC call
 func Set(kvserver *rpc.Client, key, value string) string {
 	reply := ValReply{}
-	setArgs := SetArgs{key, value}
-	err := kvserver.Call("KeyValService.Set", setArgs, &reply)
+	err := kvserver.Call("KeyValService.Set", SetArgs{key, value}, &reply)
 	if err != nil {
 		fmt.Sprintf("KeyValService.Set RPC call failed: %v", err)
 	}
@@ -54,10 +58,32 @@ func Set(kvserver *rpc.Client, key, value string) string {
 // Initiate a TestSet() RPC call
 func TestSet(kvserver *rpc.Client, key, testValue, newValue string) string {
 	reply := ValReply{}
-	testSetArgs := TestSetArgs{key, testValue, newValue}
-	err := kvserver.Call("KeyValService.TestSet", testSetArgs, &reply)
+	err := kvserver.Call("KeyValService.TestSet", TestSetArgs{key, testValue, newValue}, &reply)
 	if err != nil {
 		fmt.Sprintf("KeyValService.TestSet RPC call failed: %v", err)
 	}
 	return reply.Val
+}
+
+// Initiate a Join() RPC call
+func JoinNetwork(kvserver *rpc.Client, ipPort string) (string, error) {
+	reply := ValReply{}
+	joinArgs := JoinArgs{ipPort}
+	err := kvserver.Call("KeyValService.Join", joinArgs, &reply)
+	if err != nil {
+		reply.Val = ""
+		fmt.Sprintf("KeyValService.Join RPC call failed: %v", err)
+	}
+	return reply.Val, err
+}
+
+// Initialiate a Join() RPC call using a known node's ip:port
+func JoinNetworkByIpPort(targetIpPort, ipPort string) (string, error) {
+	rpcClient, err := rpc_util.Connect(targetIpPort)
+	if err != nil {
+		return "", err
+	}
+	defer rpcClient.Close()
+	replyVal, err := JoinNetwork(rpcClient, ipPort)
+	return replyVal, err
 }
