@@ -15,8 +15,7 @@ import (
 	"fmt"
 	"github.com/msayson/kvservice/api"
 	"github.com/msayson/kvservice/kvstore"
-	"log"
-	"net"
+	"github.com/msayson/kvservice/util/rpc_util"
 	"net/rpc"
 	"os"
 )
@@ -59,12 +58,7 @@ func main() {
 	store = kvstore.New()
 	kvservice := new(KeyValService)
 	rpc.Register(kvservice)
-	l, err := net.Listen("tcp", ip_port)
-	if err != nil {
-		log.Fatal("Error initializing listener:", err)
-	}
-	for {
-		conn, _ := l.Accept()
-		go rpc.ServeConn(conn)
-	}
+
+	// Serve RPC connections to clients
+	rpc_util.ServeRpc(ip_port)
 }

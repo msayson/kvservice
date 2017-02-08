@@ -10,7 +10,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/msayson/kvservice/api"
-	"github.com/msayson/kvservice/userinput"
+	"github.com/msayson/kvservice/util/userinput"
 	"net/rpc"
 	"os"
 )
