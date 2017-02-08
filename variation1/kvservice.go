@@ -13,7 +13,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/msayson/kvservice/kvserviceapi"
+	"github.com/msayson/kvservice/api"
 	"github.com/msayson/kvservice/kvstore"
 	"log"
 	"net"
@@ -26,19 +26,19 @@ type KeyValService int
 var store *kvstore.KVStore
 
 // Get RPC Call
-func (kvs *KeyValService) Get(args *kvserviceapi.GetArgs, reply *kvserviceapi.ValReply) error {
+func (kvs *KeyValService) Get(args *api.GetArgs, reply *api.ValReply) error {
 	reply.Val = store.Get(args.Key)
 	return nil
 }
 
 // Set RPC Call
-func (kvs *KeyValService) Set(args *kvserviceapi.SetArgs, reply *kvserviceapi.ValReply) error {
+func (kvs *KeyValService) Set(args *api.SetArgs, reply *api.ValReply) error {
 	reply.Val = store.Set(args.Key, args.Val)
 	return nil
 }
 
 // TestSet RPC Call
-func (kvs *KeyValService) TestSet(args *kvserviceapi.TestSetArgs, reply *kvserviceapi.ValReply) error {
+func (kvs *KeyValService) TestSet(args *api.TestSetArgs, reply *api.ValReply) error {
 	reply.Val = store.TestSet(args.Key, args.TestVal, args.NewVal)
 	return nil
 }

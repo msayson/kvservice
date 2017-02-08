@@ -9,7 +9,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/msayson/kvservice/kvserviceapi"
+	"github.com/msayson/kvservice/api"
 	"github.com/msayson/kvservice/userinput"
 	"net/rpc"
 	"os"
@@ -64,13 +64,13 @@ func processUserCommand(reader *bufio.Reader) {
 
 func runUserCommand(cmd userinput.LegalCommand) {
 	if cmd.Command == userinput.GET {
-		val := kvserviceapi.Get(kvserver, cmd.Args[0])
+		val := api.Get(kvserver, cmd.Args[0])
 		fmt.Printf("get(%s) -> %s\n", cmd.Args[0], val)
 	} else if cmd.Command == userinput.SET {
-		val := kvserviceapi.Set(kvserver, cmd.Args[0], cmd.Args[1])
+		val := api.Set(kvserver, cmd.Args[0], cmd.Args[1])
 		fmt.Printf("set(%s,%s) -> %s\n", cmd.Args[0], cmd.Args[1], val)
 	} else if cmd.Command == userinput.TESTSET {
-		val := kvserviceapi.TestSet(kvserver, cmd.Args[0], cmd.Args[1], cmd.Args[2])
+		val := api.TestSet(kvserver, cmd.Args[0], cmd.Args[1], cmd.Args[2])
 		fmt.Printf("testset(%s,%s,%s) -> %s\n", cmd.Args[0], cmd.Args[1], cmd.Args[2], val)
 	}
 }

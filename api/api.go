@@ -1,4 +1,4 @@
-package kvserviceapi
+package api
 
 import (
 	"fmt"
