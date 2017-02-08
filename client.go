@@ -7,10 +7,10 @@
 package main
 
 import (
-	"./kvserviceapi"
-	"./userinput"
 	"bufio"
 	"fmt"
+	"github.com/msayson/kvservice/kvserviceapi"
+	"github.com/msayson/kvservice/userinput"
 	"net/rpc"
 	"os"
 )

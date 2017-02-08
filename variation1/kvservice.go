@@ -12,9 +12,9 @@
 package main
 
 import (
-	"./kvserviceapi"
-	"./kvstore"
 	"fmt"
+	"github.com/msayson/kvservice/kvserviceapi"
+	"github.com/msayson/kvservice/kvstore"
 	"log"
 	"net"
 	"net/rpc"

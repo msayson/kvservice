@@ -17,7 +17,7 @@ Client command line interface:
 ### Variation 2 - dynamic chain of servers (upcoming)
 A simple key-value service with data replication across a chain of N back-end servers.
 
-- Client interacts with the front-end server exactly as in Phase 1
+- Client interacts with the front-end server exactly as in Variation 1
 - A chain of N back-end servers store identical copies of all key-values
 - Key-value write operations are performed on each back-end server, passed from one to the next until all are updated
 - Key-value read operations are performed on the first back-end server in the chain
