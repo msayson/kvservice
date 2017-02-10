@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-var maxConnectTries = 5
+var maxConnectTries = 10
 
 // Returns an rpc connection, or an error
 // if unable to connect after a max number of tries
@@ -20,7 +20,7 @@ func Connect(ip_port string) (*rpc.Client, error) {
 			break
 		}
 		if i < maxConnectTries-1 {
-			time.Sleep(time.Duration(500) * time.Millisecond)
+			time.Sleep(time.Duration(1) * time.Second)
 		}
 	}
 	return rpcClient, err
