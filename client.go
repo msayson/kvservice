@@ -10,6 +10,7 @@ import (
 	"bufio"
 	"fmt"
 	"github.com/msayson/kvservice/api"
+	"github.com/msayson/kvservice/util/rpc_util"
 	"github.com/msayson/kvservice/util/userinput"
 	"net/rpc"
 	"os"
@@ -66,22 +67,32 @@ func processUserCommand(reader *bufio.Reader) {
 func runUserCommand(cmd userinput.LegalCommand) {
 	if cmd.Command == userinput.GET {
 		val, err := api.Get(kvserver, cmd.Args[0])
-		printUserCmdResult("get(%s) -> %s\n", err, cmd.Args[0], val)
+		processKVResult("get(%s) -> %s\n", err, cmd.Args[0], val)
 	} else if cmd.Command == userinput.SET {
 		val, err := api.Set(kvserver, cmd.Args[0], cmd.Args[1])
-		printUserCmdResult("set(%s,%s) -> %s\n", err, cmd.Args[0], cmd.Args[1], val)
+		processKVResult("set(%s,%s) -> %s\n", err, cmd.Args[0], cmd.Args[1], val)
 	} else if cmd.Command == userinput.TESTSET {
 		val, err := api.TestSet(kvserver, cmd.Args[0], cmd.Args[1], cmd.Args[2])
-		printUserCmdResult("testset(%s,%s,%s) -> %s\n", err, cmd.Args[0], cmd.Args[1], cmd.Args[2], val)
+		processKVResult("testset(%s,%s,%s) -> %s\n", err, cmd.Args[0], cmd.Args[1], cmd.Args[2], val)
 	}
 }
 
-func printUserCmdResult(msgPattern string, err error, a ...interface{}) {
+func processKVResult(msgPattern string, err error, a ...interface{}) {
 	if err != nil {
 		fmt.Println(err)
+		reconnectToKVServer()
 	} else {
 		fmt.Printf(msgPattern, a...)
 	}
+}
+
+func reconnectToKVServer() {
+	var err error
+	fmt.Println("Reconnecting to server...")
+	kvserver.Close()
+	kvserver, err = rpc_util.Connect(os.Args[1])
+	checkError(err)
+	fmt.Println("Connection successful.")
 }
 
 // If error is non-nil, print error and shut down
