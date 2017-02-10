@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"github.com/msayson/kvservice/util/rpc_util"
 	"net/rpc"
@@ -36,33 +37,33 @@ type ValReply struct {
 }
 
 // Initiate a Get() RPC call
-func Get(kvserver *rpc.Client, key string) string {
+func Get(kvserver *rpc.Client, key string) (string, error) {
 	reply := ValReply{}
 	err := kvserver.Call("KeyValService.Get", GetArgs{key}, &reply)
 	if err != nil {
-		fmt.Sprintf("KeyValService.Get RPC call failed: %v", err)
+		err = errors.New(fmt.Sprintf("KeyValService.Get RPC call failed: %s", err.Error()))
 	}
-	return reply.Val
+	return reply.Val, err
 }
 
 // Initiate a Set() RPC call
-func Set(kvserver *rpc.Client, key, value string) string {
+func Set(kvserver *rpc.Client, key, value string) (string, error) {
 	reply := ValReply{}
 	err := kvserver.Call("KeyValService.Set", SetArgs{key, value}, &reply)
 	if err != nil {
-		fmt.Sprintf("KeyValService.Set RPC call failed: %v", err)
+		err = errors.New(fmt.Sprintf("KeyValService.Set RPC call failed: %s", err.Error()))
 	}
-	return reply.Val
+	return reply.Val, err
 }
 
 // Initiate a TestSet() RPC call
-func TestSet(kvserver *rpc.Client, key, testValue, newValue string) string {
+func TestSet(kvserver *rpc.Client, key, testValue, newValue string) (string, error) {
 	reply := ValReply{}
 	err := kvserver.Call("KeyValService.TestSet", TestSetArgs{key, testValue, newValue}, &reply)
 	if err != nil {
-		fmt.Sprintf("KeyValService.TestSet RPC call failed: %v", err)
+		err = errors.New(fmt.Sprintf("KeyValService.TestSet RPC call failed: %s", err.Error()))
 	}
-	return reply.Val
+	return reply.Val, err
 }
 
 // Initiate a Join() RPC call

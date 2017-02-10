@@ -36,6 +36,7 @@ func main() {
 	fmt.Println("   exit                       - shuts down client")
 	reader := bufio.NewReader(os.Stdin)
 	for {
+		//TODO: if front-end fails, try to reconnect
 		processUserCommand(reader)
 	}
 
@@ -64,14 +65,22 @@ func processUserCommand(reader *bufio.Reader) {
 
 func runUserCommand(cmd userinput.LegalCommand) {
 	if cmd.Command == userinput.GET {
-		val := api.Get(kvserver, cmd.Args[0])
-		fmt.Printf("get(%s) -> %s\n", cmd.Args[0], val)
+		val, err := api.Get(kvserver, cmd.Args[0])
+		printUserCmdResult("get(%s) -> %s\n", err, cmd.Args[0], val)
 	} else if cmd.Command == userinput.SET {
-		val := api.Set(kvserver, cmd.Args[0], cmd.Args[1])
-		fmt.Printf("set(%s,%s) -> %s\n", cmd.Args[0], cmd.Args[1], val)
+		val, err := api.Set(kvserver, cmd.Args[0], cmd.Args[1])
+		printUserCmdResult("set(%s,%s) -> %s\n", err, cmd.Args[0], cmd.Args[1], val)
 	} else if cmd.Command == userinput.TESTSET {
-		val := api.TestSet(kvserver, cmd.Args[0], cmd.Args[1], cmd.Args[2])
-		fmt.Printf("testset(%s,%s,%s) -> %s\n", cmd.Args[0], cmd.Args[1], cmd.Args[2], val)
+		val, err := api.TestSet(kvserver, cmd.Args[0], cmd.Args[1], cmd.Args[2])
+		printUserCmdResult("testset(%s,%s,%s) -> %s\n", err, cmd.Args[0], cmd.Args[1], cmd.Args[2], val)
+	}
+}
+
+func printUserCmdResult(msgPattern string, err error, a ...interface{}) {
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf(msgPattern, a...)
 	}
 }
 
