@@ -37,13 +37,14 @@ func main() {
 	fmt.Println("   exit                       - shuts down client")
 	reader := bufio.NewReader(os.Stdin)
 	for {
-		//TODO: if front-end fails, try to reconnect
 		processUserCommand(reader)
 	}
 
 	os.Exit(0)
 }
 
+// Convert next user input to a key-value request,
+// and print result to console
 func processUserCommand(reader *bufio.Reader) {
 	fmt.Print("> ")
 	text, err := reader.ReadString('\n')
@@ -64,6 +65,7 @@ func processUserCommand(reader *bufio.Reader) {
 	runUserCommand(fullCmd)
 }
 
+// Send key-value request and print result to console
 func runUserCommand(cmd userinput.LegalCommand) {
 	if cmd.Command == userinput.GET {
 		val, err := api.Get(kvserver, cmd.Args[0])
@@ -77,6 +79,8 @@ func runUserCommand(cmd userinput.LegalCommand) {
 	}
 }
 
+// Print server response to console, and if received error response,
+// try to reconnect to server
 func processKVResult(msgPattern string, err error, a ...interface{}) {
 	if err != nil {
 		fmt.Println(err)
@@ -86,6 +90,7 @@ func processKVResult(msgPattern string, err error, a ...interface{}) {
 	}
 }
 
+// Close current rpc connection to server and try to reconnect
 func reconnectToKVServer() {
 	var err error
 	fmt.Println("Reconnecting to server...")
