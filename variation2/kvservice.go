@@ -13,86 +13,37 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"github.com/msayson/kvservice/api"
 	"github.com/msayson/kvservice/util/rpc_util"
+	"github.com/msayson/kvservice/variation2/nodechain"
 	"net/rpc"
 	"os"
 )
 
 type KeyValService int
 
-// First two back-end nodes
-var nodeChain struct {
-	HeadIpPort string
-	NextIpPort string
-}
+// Network of back-end nodes which store key-values
+var nodeChain nodechain.NodeChain
 
-// Get RPC Call
+// Get RPC call: retrieves a key-value from the network
 func (kvs *KeyValService) Get(args *api.GetArgs, reply *api.ValReply) error {
-	rpcClient, err := connectToNode()
-	if err != nil {
-		return err
-	}
-	defer rpcClient.Close()
-	return rpcClient.Call("KeyValService.Get", args, reply)
+	return nodeChain.Get(args, reply)
 }
 
-// Set RPC Call
+// Set RPC call: sets a key-value in the network
 func (kvs *KeyValService) Set(args *api.SetArgs, reply *api.ValReply) error {
-	rpcClient, err := connectToNode()
-	if err != nil {
-		return err
-	}
-	defer rpcClient.Close()
-	return rpcClient.Call("KeyValService.Set", args, reply)
+	return nodeChain.Set(args, reply)
 }
 
-// TestSet RPC Call
+// TestSet RPC call: test-sets a key-value in the network
 func (kvs *KeyValService) TestSet(args *api.TestSetArgs, reply *api.ValReply) error {
-	rpcClient, err := connectToNode()
-	if err != nil {
-		return err
-	}
-	defer rpcClient.Close()
-	return rpcClient.Call("KeyValService.TestSet", args, reply)
+	return nodeChain.TestSet(args, reply)
 }
 
-func connectToNode() (*rpc.Client, error) {
-	var rpcClient *rpc.Client
-	if nodeChain.HeadIpPort == "" {
-		if nodeChain.NextIpPort == "" {
-			return rpcClient, storeUnavailableError()
-		}
-		nodeChain.HeadIpPort = nodeChain.NextIpPort
-		nodeChain.NextIpPort = ""
-	}
-	rpcClient, err := rpc_util.Connect(nodeChain.HeadIpPort)
-	if err != nil {
-		nodeChain.HeadIpPort = ""
-		err = storeUnavailableError()
-	}
-	return rpcClient, err
-}
-
-// Join RPC Call - a new back-end node is joining the server chain
-// Returns:
-// - "success" if the node has been added to the end of the chain
-// - the ip:port of the next node if there are more nodes to visit
+// Join RPC call: add a new back-end node to the network
 func (kvs *KeyValService) Join(args *api.JoinArgs, reply *api.ValReply) error {
-	if nodeChain.HeadIpPort == "" {
-		nodeChain.HeadIpPort = args.IpPort
-		reply.Val = "success"
-	} else if nodeChain.NextIpPort == "" {
-		nodeChain.NextIpPort = args.IpPort
-		reply.Val = nodeChain.HeadIpPort
-	} else {
-		// Pass to head instead of next so that each node
-		// is aware of the next two in the chain
-		reply.Val = nodeChain.HeadIpPort
-	}
-	return nil
+	return nodeChain.Join(args, reply)
 }
 
 func main() {
@@ -103,6 +54,7 @@ func main() {
 	rpc.Register(kvservice)
 
 	// Listen for backend node connections in a concurrent goroutine
+	nodeChain = nodechain.NodeChain{"", ""}
 	go rpc_util.ServeRpc(backend_ip_port)
 
 	// Listen for client connections
@@ -117,8 +69,4 @@ func parseRuntimeParams() (string, string) {
 		os.Exit(1)
 	}
 	return os.Args[1], os.Args[2]
-}
-
-func storeUnavailableError() error {
-	return errors.New("Key-value store is unavailable")
 }
