@@ -55,6 +55,11 @@ func (kvs *KeyValService) Join(args *api.JoinArgs, reply *api.ValReply) error {
 	return nodeChain.Join(args, reply)
 }
 
+// GetNextNodes RPC call: returns ip:port addresses of next nodes in chain
+func (kvs *KeyValService) GetNextNodes(_ int, reply *api.GetNextNodesReply) error {
+	return nodeChain.GetNextNodes(reply)
+}
+
 func main() {
 	ip_port, frontend_ip_port := parseRuntimeParams()
 

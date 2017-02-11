@@ -1,6 +1,7 @@
 package rpc_util
 
 import (
+	"errors"
 	"log"
 	"net"
 	"net/rpc"
@@ -12,6 +13,10 @@ var maxConnectTries = 10
 // Returns an rpc connection, or an error
 // if unable to connect after a max number of tries
 func Connect(ip_port string) (*rpc.Client, error) {
+	if ip_port == "" {
+		return nil, errors.New("rpc_util.Connect: tried to pass empty string as ip:port")
+	}
+
 	var rpcClient *rpc.Client
 	var err error
 	for i := 0; i < maxConnectTries; i++ {

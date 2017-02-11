@@ -36,6 +36,12 @@ type ValReply struct {
 	Val string
 }
 
+// Struct for GetNextNodes() RPC call replies
+type GetNextNodesReply struct {
+	HeadIpPort string
+	NextIpPort string
+}
+
 // Initiate a Get() RPC call
 func Get(kvserver *rpc.Client, key string) (string, error) {
 	reply := ValReply{}
