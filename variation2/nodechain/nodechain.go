@@ -6,12 +6,24 @@ import (
 	"github.com/msayson/kvservice/api"
 	"github.com/msayson/kvservice/util/rpc_util"
 	"net/rpc"
+	"sync"
 )
 
 // First two back-end nodes
 type NodeChain struct {
 	HeadIpPort string
 	NextIpPort string
+	lock       *sync.RWMutex // read/write mutex for safe concurrent access
+}
+
+func New() *NodeChain {
+	var chain NodeChain
+	// Initialize node ip:port values
+	chain.HeadIpPort = ""
+	chain.NextIpPort = ""
+	// Initialize read/write mutex
+	chain.lock = &sync.RWMutex{}
+	return &chain
 }
 
 // Get RPC call: retrieves a key-value from the network
@@ -49,6 +61,7 @@ func (chain *NodeChain) TestSet(args *api.TestSetArgs, reply *api.ValReply) erro
 // - "success" if the node has been added to the end of the chain
 // - the ip:port of the next node if there are more nodes to visit
 func (chain *NodeChain) Join(args *api.JoinArgs, reply *api.ValReply) error {
+	chain.lock.Lock()
 	if chain.HeadIpPort == "" {
 		chain.HeadIpPort = args.IpPort
 		reply.Val = "success"
@@ -56,10 +69,11 @@ func (chain *NodeChain) Join(args *api.JoinArgs, reply *api.ValReply) error {
 		chain.NextIpPort = args.IpPort
 		reply.Val = chain.HeadIpPort
 	} else {
-		// Direct node to head instead of next so that each node
+		// Forward node to head instead of next so that each node
 		// is aware of the next two in the chain
 		reply.Val = chain.HeadIpPort
 	}
+	chain.lock.Unlock()
 	return nil
 }
 
@@ -75,6 +89,9 @@ func (chain *NodeChain) Print(prefix string) {
 //   to request IpPorts of any subsequent nodes
 func (chain *NodeChain) connectToNode() (*rpc.Client, error) {
 	var rpcClient *rpc.Client
+	chain.lock.Lock()
+	defer chain.lock.Unlock()
+
 	if chain.HeadIpPort == "" {
 		if chain.NextIpPort == "" {
 			return rpcClient, storeUnavailableError()

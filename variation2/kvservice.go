@@ -24,7 +24,7 @@ import (
 type KeyValService int
 
 // Network of back-end nodes which store key-values
-var nodeChain nodechain.NodeChain
+var nodeChain *nodechain.NodeChain
 
 // Get RPC call: retrieves a key-value from the network
 func (kvs *KeyValService) Get(args *api.GetArgs, reply *api.ValReply) error {
@@ -54,7 +54,7 @@ func main() {
 	rpc.Register(kvservice)
 
 	// Listen for backend node connections in a concurrent goroutine
-	nodeChain = nodechain.NodeChain{"", ""}
+	nodeChain = nodechain.New()
 	go rpc_util.ServeRpc(backend_ip_port)
 
 	// Listen for client connections

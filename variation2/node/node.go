@@ -28,7 +28,7 @@ type KeyValService int
 var store *kvstore.KVStore
 
 // Network of subsequent back-end nodes
-var nodeChain nodechain.NodeChain
+var nodeChain *nodechain.NodeChain
 
 // Get RPC call: retrieves a key-value from the network
 func (kvs *KeyValService) Get(args *api.GetArgs, reply *api.ValReply) error {
@@ -64,7 +64,7 @@ func main() {
 	rpc.Register(kvservice)
 
 	// Contact front-end server to join the network
-	nodeChain = nodechain.NodeChain{"", ""}
+	nodeChain = nodechain.New()
 	joinNetwork(ip_port, frontend_ip_port)
 
 	// Listen for client connections
