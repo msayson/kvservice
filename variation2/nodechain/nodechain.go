@@ -68,6 +68,11 @@ func (chain *NodeChain) Print(prefix string) {
 	fmt.Printf("%sNodeChain{%s, %s}\n", prefix, chain.HeadIpPort, chain.NextIpPort)
 }
 
+// Establish a connection to the first live node in the chain
+// Side effect: removes unresponsive head nodes, until either
+//   a live node is found or no nodes are left in the chain
+// TODO: if the chain is not full, contact the tail node
+//   to request IpPorts of any subsequent nodes
 func (chain *NodeChain) connectToNode() (*rpc.Client, error) {
 	var rpcClient *rpc.Client
 	if chain.HeadIpPort == "" {

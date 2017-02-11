@@ -39,12 +39,14 @@ func (kvs *KeyValService) Get(args *api.GetArgs, reply *api.ValReply) error {
 // Set RPC call: sets a key-value in the network
 func (kvs *KeyValService) Set(args *api.SetArgs, reply *api.ValReply) error {
 	reply.Val = store.Set(args.Key, args.Val)
+	go nodeChain.Set(args, reply) // Propagate change to subsequent nodes
 	return nil
 }
 
 // TestSet RPC call: test-sets a key-value in the network
 func (kvs *KeyValService) TestSet(args *api.TestSetArgs, reply *api.ValReply) error {
 	reply.Val = store.TestSet(args.Key, args.TestVal, args.NewVal)
+	go nodeChain.TestSet(args, reply) // Propagate change to subsequent nodes
 	return nil
 }
 
