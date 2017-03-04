@@ -1,9 +1,6 @@
 # kvservice
 A simple key-value service, with variations demonstrating different failure recovery strategies.
 
-### Variation 1 - single server
-A simple client/server system in which clients can send requests to read/write key-values.
-
 Client command line interface:
 
 <table>
@@ -13,6 +10,11 @@ Client command line interface:
   <tr><td>testset(id,testVal,newVal)</td><td>if id has testVal as its value, set to newVal</td></tr>
   <tr><td>exit</td><td>shuts down client</td></tr>
 </table>
+
+### Variation 1 - single server
+A simple client/server system in which clients can send requests to read/write key-values.
+
+![alt-text](https://github.com/msayson/kvservice/wiki/design_mockups/images/variation1singleserver.png "Diagram of single-server key-value service")
 
 ### Variation 2 - dynamic chain of servers (in progress)
 A simple key-value service with data replication across a chain of N back-end servers.
